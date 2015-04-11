@@ -1,4 +1,12 @@
 [root]
 name = "fin"
-version = "0.0.1"
+version = "0.0.5"
+dependencies = [
+ "clap 0.5.14 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "clap"
+version = "0.5.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
