@@ -15,24 +15,16 @@ pub fn main() {
     };
 
     match get_descendants(&target, &words[..]) {
-        Ok(descendants) => for d in descendants { println!("{}", d); },
-        Err(e) => println!("{}", e),
+        Some(descendants) => for d in descendants { println!("{}", d); },
+        None => println!("No matches found."),
     }
 }
 
-/*
-fn get_descendants<'a>(target: &str, words: &[String]) -> Result<Box<Iterator<Item=&'a str>>, &'static str> {
-    match words.binary_search(&target.to_string()) {
-        Ok(idx) => Ok(box words[idx..].iter().take_while(|w| w.starts_with(target))),
-        Err(_) => return Err("No matches found."),
-    }
-}
-*/
-
-fn get_descendants<'a>(target: &str, words: &'a [String]) -> Result<&'a [String], &'static str> {
-    match words.binary_search(&target.to_string()) {
-        Ok(idx) => Ok(&words[idx..(idx + words[idx..].iter().take_while(|w| w.starts_with(target)).count())]),
-        Err(_) => return Err("No matches found."),
+fn get_descendants<'a>(target: &str, words: &'a [String]) -> Option<&'a [String]> {
+    let idx = words.binary_search(&target.to_string()).unwrap_or_else(|e| e);
+    match words[idx].starts_with(target) {
+        true => Some(&words[idx..(idx + words[idx..].iter().take_while(|w| w.starts_with(target)).count())]),
+        false => None,
     }
 }
 
@@ -50,7 +42,11 @@ fn read_args() -> Result<(Vec<String>, String), String> {
 }
 
 fn load_words<R: BufRead>(r: R) -> Vec<String> {
-    BufReader::new(r).lines()
+    let mut words: Vec<String> = BufReader::new(r).lines()
         .filter_map(|l| l.map(|l| l.trim().to_string()).ok())
-        .collect()
+        .collect();
+
+    // It is conceivably possible that the words won't be sorted, so... Fuck it.
+    words.sort();
+    words
 }
