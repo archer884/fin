@@ -11,13 +11,14 @@ pub fn read_args() -> Result<(Vec<String>, String), String> {
     // we handle the prefix:
     let prefix = match matches.value_of("prefix") {
         Some(prefix) => prefix,
-        None => return Err("prefix not provided".to_string()),
+        None => return Err("Prefix not provided".to_string()),
     };
 
     // And here we handle the dictionary:
     let file = match matches.value_of("dictionary").map(|p| File::open(&Path::new(p))) {
         Some(Ok(file)) => file,
-        _ => return Err("dictionary not provided".to_string()),
+        Some(Err(_)) => return Err("Unable to open file".to_string()),
+        None => return Err("Dictionary not provided".to_string()),
     };
 
     let sort = matches.is_present("sort");
