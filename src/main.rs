@@ -37,16 +37,12 @@ fn read_args() -> Result<(Vec<String>, String), String> {
                 Err(e) => Err(e.description().to_string())
             }
         },
-        _ => Err(format!("USAGE: \n{} <word file path> <word to complete>", args[0])),
+        _ => Err(format!("USAGE:\t{} <dictionary> <prefix>", args[0])),
     }
 }
 
 fn load_words<R: BufRead>(r: R) -> Vec<String> {
-    let mut words: Vec<String> = BufReader::new(r).lines()
+    BufReader::new(r).lines()
         .filter_map(|l| l.map(|l| l.trim().to_string()).ok())
-        .collect();
-
-    // It is conceivably possible that the words won't be sorted, so... Fuck it.
-    words.sort();
-    words
+        .collect()
 }
