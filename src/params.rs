@@ -1,4 +1,5 @@
 use clap::{ App, Arg, ArgMatches };
+use std::error::Error;
 use std::fs::File;
 use std::io::{ BufRead, BufReader };
 use std::path::Path;
@@ -17,7 +18,7 @@ pub fn read_args() -> Result<(Vec<String>, String), String> {
     // And here we handle the dictionary:
     let file = match matches.value_of("dictionary").map(|p| File::open(&Path::new(p))) {
         Some(Ok(file)) => file,
-        Some(Err(_)) => return Err("Unable to open file".to_string()),
+        Some(Err(e)) => return Err(format!("Unable to open file: {}", e.description())),
         None => return Err("Dictionary not provided".to_string()),
     };
 
